@@ -1,0 +1,22 @@
+---
+all:
+  children:
+    arista-switches:
+      vars:
+        ansible_network_os: arista.eos.eos
+        ansible_connection: network_cli
+        ansible_become: true
+        ansible_become_method: enable
+      children:
+        spines:
+          hosts:
+            SPINE-1:
+              ansible_host: x.x.x.x
+            SPINE-2:
+              ansible_host: x.x.x.x
+        leaves:
+          hosts:
+            LEAF-1:
+              ansible_host: x.x.x.x
+            LEAF-2:
+              ansible_host: x.x.x.x
