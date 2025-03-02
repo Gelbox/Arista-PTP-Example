@@ -1,0 +1,55 @@
+---
+- name: Configure Spine PTP and ACL settings
+  hosts: arista-switches
+  gather_facts: no
+
+  # Prompt for credentials at runtime
+  vars_prompt:
+    - name: net_user
+      prompt: "Enter your Arista username"
+    - name: net_pass
+      prompt: "Enter your Arista password"
+      private: yes
+
+  vars:
+    ansible_user: "{{ net_user }}"
+    ansible_password: "{{ net_pass }}"
+    ansible_command_timeout: 60
+
+  tasks:
+    - name: Test connectivity by running show version
+      arista.eos.eos_command:
+        commands: show version
+      register: version_output
+
+    - name: Display version output
+      debug:
+        var: version_output
+    ##############################################
+    # Spines Specific Configuration
+    ##############################################
+    - name: Configure PTP on Spine-1
+      arista.eos.eos_config:
+        lines:
+          - "interface Ethernet1-2,3,5"
+          - "ptp enable"
+          - "ptp announce interval 0"
+          - "ptp delay-req interval -3"
+          - "ptp role master"
+          - "ptp sync-message interval -3"
+      when: inventory_hostname == "SPINE-1"
+
+    - name: Configure ACL on Spine-1 & 2 
+      arista.eos.eos_config:
+        lines:
+          - "ip access-list ALLOW_ONLY_PTP"
+          - " 10 permit udp any eq ptp-general any eq ptp-general"
+          - " 20 permit udp any eq ptp-event any eq ptp-event"
+      when: inventory_hostname == "SPINE-1, SPINE-2:"
+
+    - name: Apply ACL on Spine-1 & 2
+      arista.eos.eos_config:
+        lines:
+          - "interface Ethernet1-2"
+          - "ip access-group ALLOW_ONLY_PTP in"
+
