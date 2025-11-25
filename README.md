@@ -16,11 +16,15 @@ This Ansible playbook automates the setup of PTP boundary clocks on Arista switc
 Ensure you have the following before running the playbook:
 
 1️⃣ Ansible Installed (v2.10+)
+
 2️⃣ Arista EOS Devices with API access enabled
+
 3️⃣ SSH Connectivity to switches
+
 4️⃣ Python & Required Modules: paramiko, netmiko
 
 ⚙️ How to Use
+
 1️⃣ Clone the Repository
 
 
